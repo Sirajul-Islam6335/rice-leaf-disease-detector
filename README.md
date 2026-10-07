@@ -1,8 +1,11 @@
 # RiceLeaf: rice leaf disease detection web app
 
-A Django web application that diagnoses **Bacterial leaf blight**, **Brown spot** and **Leaf smut** from a photo of a rice leaf. The model is a convolutional neural network written **from scratch in NumPy** (`riceleaf/`): no TensorFlow, Keras or PyTorch.
+A Django web application that diagnoses **Bacterial leaf blight**, **Brown spot** and **Leaf smut** from a photo of a rice leaf. The model is a convolutional neural network written **from scratch in NumPy** (`riceleaf/`):
 
-**Stack:** Python 3.8+ · Django 5.2 (4.2 LTS on Python 3.8/3.9) · HTML templates · Bootstrap 5 · custom CSS · vanilla JavaScript · SQL (SQLite by default, PostgreSQL supported) · NumPy CNN
+**Live project Link** : https://riceleaf-nywp.onrender.com
+
+
+**Stack:** Python 3.8+ · Django 5.2 (4.2 LTS on Python 3.8/3.9) · HTML templates · Bootstrap 5 · custom CSS · vanilla JavaScript · SQL (SQLite by default, PostgreSQL supported) · NumPy, Convulation Neural Network
 
 ---
 
