@@ -1,0 +1,10 @@
+# Works on Python 3.8 - 3.13. pip picks the right Django for your Python automatically:
+#   Python 3.10+  -> Django 5.2 (current)      Python 3.8 / 3.9 -> Django 4.2 LTS
+Django>=5.1,<6.0 ; python_version >= "3.10"
+Django>=4.2,<5.0 ; python_version < "3.10"
+numpy>=1.22          # the CNN engine (riceleaf/) - no TensorFlow / Keras / PyTorch
+Pillow>=9.1          # image decoding (also required by Django's ImageField)
+whitenoise>=6.5      # serves static files in production
+gunicorn>=21 ; sys_platform != "win32"   # production server for Linux/macOS (not used on Windows)
+psycopg[binary]>=3.1 # only needed when DB_ENGINE=postgres
+matplotlib>=3.5      # optional: plots when retraining with `manage.py train_model`

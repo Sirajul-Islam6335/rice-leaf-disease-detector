@@ -1,0 +1,44 @@
+{% extends "detector/base.html" %}
+{% block title %}My diagnoses{% endblock %}
+{% block content %}
+<h1 class="page-title">My diagnoses</h1>
+{% if user.is_authenticated %}
+  {% if summary.total %}
+    <p class="lede">{{ summary.total }} diagnos{{ summary.total|pluralize:"is,es" }} saved to your account.
+      {{ summary.uncertain }} flagged as low confidence, {{ summary.reviewed }} with your feedback.</p>
+  {% endif %}
+{% else %}
+  <p class="lede">These are the diagnoses from this browser session.
+    <a href="{% url 'detector:signup' %}">Create an account</a> or <a href="{% url 'detector:login' %}?next={{ request.path|urlencode }}">sign in</a> to keep them.</p>
+{% endif %}
+{% if user.is_staff %}<p class="small text-muted-2">You're staff, so this list includes every user's diagnoses.</p>{% endif %}
+
+<nav class="filter-row" aria-label="Filter diagnoses">
+  <a class="filter-pill {% if not active and not review_only %}is-active{% endif %}" href="{% url 'detector:history' %}">All</a>
+  {% for d in diseases %}
+    <a class="filter-pill {% if active == d %}is-active{% endif %}" href="?disease={{ d.slug }}">
+      <span class="swatch" style="--swatch: {{ d.color }}" aria-hidden="true"></span>{{ d.name }}</a>
+  {% endfor %}
+  <a class="filter-pill {% if review_only %}is-active{% endif %}" href="?review=1"><i class="bi bi-flag" aria-hidden="true"></i> Needs review</a>
+</nav>
+
+{% if page.object_list %}
+  <ul class="prediction-list">
+    {% for p in page.object_list %}{% include "detector/_prediction_row.html" %}{% endfor %}
+  </ul>
+  {% if page.has_other_pages %}
+    <nav aria-label="Pages">
+      <ul class="pagination">
+        {% if page.has_previous %}<li class="page-item"><a class="page-link" href="?{% if active %}disease={{ active.slug }}&{% endif %}{% if review_only %}review=1&{% endif %}page={{ page.previous_page_number }}">Previous</a></li>{% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ page.number }} of {{ page.paginator.num_pages }}</span></li>
+        {% if page.has_next %}<li class="page-item"><a class="page-link" href="?{% if active %}disease={{ active.slug }}&{% endif %}{% if review_only %}review=1&{% endif %}page={{ page.next_page_number }}">Next</a></li>{% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <p class="mb-3">{% if active or review_only %}No diagnoses match this filter.{% else %}No diagnoses yet. Upload a leaf photo to get your first one.{% endif %}</p>
+    <a class="btn btn-primary" href="{% url 'detector:home' %}">Diagnose a leaf</a>
+  </div>
+{% endif %}
+{% endblock %}

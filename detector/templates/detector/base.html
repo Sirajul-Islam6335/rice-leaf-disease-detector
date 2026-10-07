@@ -1,0 +1,81 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Rice leaf disease check{% endblock %} | {{ site_name }}</title>
+  <meta name="description" content="Upload a photo of a rice leaf to screen it for bacterial leaf blight, brown spot and leaf smut.">
+  <link href="{% static 'detector/vendor/fonts/plex.css' %}" rel="stylesheet">
+  <link href="{% static 'detector/vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'detector/vendor/bootstrap-icons/bootstrap-icons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'detector/css/style.css' %}" rel="stylesheet">
+  <link rel="icon" href="{% static 'detector/img/favicon.svg' %}" type="image/svg+xml">
+</head>
+<body>
+<a class="visually-hidden-focusable skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar navbar-expand-lg site-nav">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'detector:home' %}">
+      <span class="brand-leaf" aria-hidden="true"></span>{{ site_name }}
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if nav == 'home' %}active{% endif %}" {% if nav == 'home' %}aria-current="page"{% endif %} href="{% url 'detector:home' %}">Diagnose</a></li>
+        <li class="nav-item"><a class="nav-link {% if nav == 'history' %}active{% endif %}" {% if nav == 'history' %}aria-current="page"{% endif %} href="{% url 'detector:history' %}">My diagnoses</a></li>
+        <li class="nav-item"><a class="nav-link {% if nav == 'diseases' %}active{% endif %}" {% if nav == 'diseases' %}aria-current="page"{% endif %} href="{% url 'detector:diseases' %}">Diseases</a></li>
+        <li class="nav-item"><a class="nav-link {% if nav == 'dashboard' %}active{% endif %}" {% if nav == 'dashboard' %}aria-current="page"{% endif %} href="{% url 'detector:dashboard' %}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {% if nav == 'about' %}active{% endif %}" {% if nav == 'about' %}aria-current="page"{% endif %} href="{% url 'detector:about' %}">How it works</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle me-1" aria-hidden="true"></i>{{ user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>{% endif %}
+              <li>
+                <form method="post" action="{% url 'detector:logout' %}">{% csrf_token %}
+                  <button class="dropdown-item" type="submit">Sign out</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'detector:login' %}?next={{ request.path|urlencode }}">Sign in</a></li>
+          <li class="nav-item"><a class="btn btn-outline-primary btn-sm ms-lg-2 mt-2 mt-lg-0" href="{% url 'detector:signup' %}">Create account</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="container py-4 py-lg-5">
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="mb-1"> @ All Rights reserved to Md Sirajul Islam</p>
+  </div>
+</footer>
+
+<script src="{% static 'detector/vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'detector/js/app.js' %}" defer></script>
+</body>
+</html>

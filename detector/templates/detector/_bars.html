@@ -1,0 +1,12 @@
+{% load detector_extras %}
+<ul class="prob-bars">
+  {% for b in bars %}
+    <li class="prob-bar">
+      <span class="prob-name">{{ b.name }}</span>
+      <span class="prob-track" role="progressbar" aria-label="{{ b.name }}" aria-valuenow="{{ b.percent }}" aria-valuemin="0" aria-valuemax="100">
+        <span class="prob-fill" style="--w: {{ b.percent|stringformat:'.1f' }}%; --swatch: {{ b.color }}"></span>
+      </span>
+      <span class="prob-value">{{ b.probability|pct:1 }}</span>
+    </li>
+  {% endfor %}
+</ul>

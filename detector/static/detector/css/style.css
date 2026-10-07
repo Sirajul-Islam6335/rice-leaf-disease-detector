@@ -1,0 +1,228 @@
+/* RiceLeaf - site styles layered on Bootstrap 5.3
+   Palette is taken from the paddy field: deep paddy green, young-rice green, silt blue-grey,
+   and a cool field-white. Each disease is marked with the colour of its own lesions
+   (stored in the Disease table), always as an elongated "leaf" swatch. */
+
+:root {
+  --paddy: #1f4d2b;
+  --paddy-dark: #163a20;
+  --sprout: #6fa356;
+  --silt: #3c5a6b;
+  --field: #f4f6f1;
+  --surface: #ffffff;
+  --ink: #1c2620;
+  --muted: #56625a;
+  --line: #d9e0d3;
+  --warn: #9a6a00;
+  --radius-pill: 999px;
+  --radius-panel: 14px;
+
+  --bs-body-bg: var(--field);
+  --bs-body-color: var(--ink);
+  --bs-body-font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bs-body-line-height: 1.6;
+  --bs-link-color: var(--paddy);
+  --bs-link-color-rgb: 31, 77, 43;
+  --bs-link-hover-color: var(--paddy-dark);
+  --bs-link-hover-color-rgb: 22, 58, 32;
+  --bs-border-color: var(--line);
+  --bs-primary: var(--paddy);
+  --bs-primary-rgb: 31, 77, 43;
+  --bs-focus-ring-color: rgba(111, 163, 86, .45);
+}
+
+body { font-size: 1rem; min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1 0 auto; }
+:focus-visible { outline: 3px solid var(--sprout); outline-offset: 2px; }
+.skip-link { position: absolute; left: 1rem; top: .5rem; z-index: 1000; background: var(--surface); padding: .5rem .75rem; }
+
+/* --- Type ---------------------------------------------------------------- */
+.page-title, .diagnosis-title, .disease-heading, .disease-name, .section-title {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  color: var(--ink);
+}
+.page-title { font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem); font-weight: 600; line-height: 1.15; margin-bottom: .75rem; }
+.section-title { font-size: 1.45rem; font-weight: 500; line-height: 1.25; margin: 2.5rem 0 1rem; }
+.sub-title { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 38em; margin-bottom: 1.75rem; }
+.text-muted-2 { color: var(--muted) !important; }
+.pathogen { color: var(--muted); margin-bottom: .5rem; }
+.pathogen em { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; }
+.note { color: var(--muted); max-width: 42em; }
+.tight-list { padding-left: 1.15rem; max-width: 40em; }
+.tight-list li { margin-bottom: .35rem; }
+
+/* --- Buttons & forms (Bootstrap overrides) -------------------------------- */
+.btn-primary {
+  --bs-btn-bg: var(--paddy); --bs-btn-border-color: var(--paddy);
+  --bs-btn-hover-bg: var(--paddy-dark); --bs-btn-hover-border-color: var(--paddy-dark);
+  --bs-btn-active-bg: var(--paddy-dark); --bs-btn-active-border-color: var(--paddy-dark);
+  --bs-btn-disabled-bg: var(--paddy); --bs-btn-disabled-border-color: var(--paddy);
+  --bs-btn-focus-shadow-rgb: 111, 163, 86;
+  font-weight: 500;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--paddy); --bs-btn-border-color: var(--paddy);
+  --bs-btn-hover-bg: var(--paddy); --bs-btn-hover-border-color: var(--paddy);
+  --bs-btn-active-bg: var(--paddy-dark); --bs-btn-active-border-color: var(--paddy-dark);
+  --bs-btn-focus-shadow-rgb: 111, 163, 86;
+}
+.btn-lg { padding: .7rem 1.5rem; border-radius: var(--radius-pill); }
+.form-control:focus, .form-check-input:focus { border-color: var(--sprout); box-shadow: 0 0 0 .2rem rgba(111, 163, 86, .3); }
+.form-check-input:checked { background-color: var(--paddy); border-color: var(--paddy); }
+.field-error { color: #a12d1f; font-size: .9rem; margin: .4rem 0 0; }
+
+/* --- Navigation & footer ---------------------------------------------------- */
+.site-nav { background: var(--surface); border-bottom: 1px solid var(--line); }
+.navbar-brand { font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; color: var(--paddy); display: flex; align-items: center; gap: .55rem; }
+.navbar-brand:hover { color: var(--paddy-dark); }
+.brand-leaf { width: 2.1rem; height: .7rem; border-radius: var(--radius-pill) 0; background: linear-gradient(90deg, var(--paddy), var(--sprout)); transform: rotate(-12deg); }
+.site-nav .nav-link { color: var(--muted); }
+.site-nav .nav-link:hover, .site-nav .nav-link.active { color: var(--paddy); }
+.site-nav .nav-link.active { box-shadow: inset 0 -2px 0 var(--sprout); }
+.site-footer { border-top: 1px solid var(--line); padding: 1.75rem 0; font-size: .9rem; background: var(--surface); }
+
+/* --- Disease swatch: an elongated leaf-shaped mark in the lesion colour ------ */
+.swatch { display: inline-block; width: 1.5rem; height: .55rem; border-radius: var(--radius-pill) 0; background: var(--swatch, var(--muted)); vertical-align: middle; flex-shrink: 0; }
+.swatch-lg { width: 3rem; height: 1rem; }
+
+/* --- The leaf-strip upload zone ------------------------------------------- */
+/* The drop area has the 3.2:1 proportion of the model's input (80x256 px):
+   what you see is the shape the network looks at. */
+.upload-form { max-width: 980px; }
+.dropzone { position: relative; }
+.dropzone-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.leaf-strip {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 100%; aspect-ratio: 3.2 / 1; min-height: 150px;
+  border: 2px dashed var(--sprout); border-radius: var(--radius-pill);
+  background: #eef4e9; cursor: pointer; overflow: hidden; text-align: center; padding: 1rem 3rem;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.leaf-strip::before { /* the midrib of the leaf */
+  content: ""; position: absolute; left: 6%; right: 6%; top: 50%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(111, 163, 86, .45) 12%, rgba(111, 163, 86, .45) 88%, transparent);
+}
+.leaf-strip:hover, .dropzone.is-dragover .leaf-strip { background: #e3eedb; border-style: solid; }
+.dropzone:focus-within .leaf-strip { outline: 3px solid var(--sprout); outline-offset: 3px; }
+.dropzone.has-error .leaf-strip { border-color: #a12d1f; }
+.dropzone.has-preview .leaf-strip { border-style: solid; border-color: var(--paddy); padding: 0; }
+.dropzone.has-preview .leaf-strip::before { display: none; }
+.leaf-strip-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.leaf-strip-prompt { position: relative; display: flex; flex-direction: column; gap: .35rem; background: #eef4e9; padding: .35rem 1rem; border-radius: 10px; }
+.prompt-main { font-weight: 500; font-size: 1.1rem; }
+.prompt-link { color: var(--paddy); text-decoration: underline; text-underline-offset: 3px; }
+.prompt-hint { color: var(--muted); font-size: .9rem; }
+.upload-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+
+/* --- Samples ----------------------------------------------------------------- */
+.sample-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.sample-button {
+  display: flex; align-items: center; gap: .75rem; padding: .35rem 1rem .35rem .35rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--ink); font-weight: 500;
+}
+.sample-button:hover { border-color: var(--sprout); }
+.sample-button img { width: 104px; height: 34px; object-fit: cover; border-radius: var(--radius-pill); }
+.sample-button[disabled] { opacity: .65; }
+
+/* --- Disease rows on the home page -------------------------------------------- */
+.disease-rows { list-style: none; padding: 0; margin: 0 0 1rem; border-top: 1px solid var(--line); }
+.disease-row { display: grid; grid-template-columns: 3.5rem 1fr; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); max-width: 52em; }
+.disease-row .swatch-lg { margin-top: .55rem; }
+.disease-name { font-size: 1.2rem; font-weight: 500; margin: 0 0 .15rem; }
+.disease-name a { color: var(--ink); text-decoration: none; }
+.disease-name a:hover { text-decoration: underline; }
+
+/* --- Prediction lists ----------------------------------------------------------- */
+.prediction-list { list-style: none; padding: 0; margin: 0 0 1.5rem; }
+.prediction-row + .prediction-row { border-top: 1px solid var(--line); }
+.stretched-link-wrap { display: grid; grid-template-columns: 160px 1fr auto; gap: 1rem; align-items: center; padding: .85rem .5rem; color: inherit; text-decoration: none; border-radius: 10px; }
+.stretched-link-wrap:hover { background: var(--surface); }
+.thumb-strip { width: 160px; height: 50px; object-fit: cover; border-radius: var(--radius-pill); background: var(--line); }
+.prediction-main { display: flex; flex-direction: column; min-width: 0; }
+.prediction-label { font-weight: 600; display: flex; align-items: center; gap: .5rem; }
+.prediction-sub { color: var(--muted); font-size: .9rem; }
+.prediction-flags { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: flex-end; }
+.prediction-list.compact .stretched-link-wrap { grid-template-columns: 110px 1fr; }
+.prediction-list.compact .thumb-strip { width: 110px; height: 34px; }
+.prediction-list.compact .prediction-flags { display: none; }
+.badge { font-weight: 500; border-radius: var(--radius-pill); padding: .35em .7em; }
+.badge-review { background: #fbf1d7; color: var(--warn); }
+.badge-ok { background: #e1efd9; color: var(--paddy); }
+.badge-wrong { background: #e7edf1; color: var(--silt); }
+
+/* --- Result page ---------------------------------------------------------------- */
+.result-photo { margin: 0 0 1.5rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-panel); padding: .5rem; }
+.result-photo img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 8px; display: block; }
+.diagnosis-title { font-size: clamp(2rem, 1.5rem + 2vw, 2.6rem); font-weight: 600; display: flex; align-items: center; gap: .85rem; margin-bottom: .35rem; }
+.diagnosis-line { font-size: 1.15rem; color: var(--muted); }
+.diagnosis-line strong { color: var(--ink); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 1.25rem 1.25rem 1.35rem; margin-bottom: 1.25rem; }
+.panel-quiet { background: transparent; border-style: dashed; }
+.panel-title { font-family: "IBM Plex Serif", Georgia, serif; font-size: 1.2rem; font-weight: 500; margin-bottom: .75rem; }
+.details { display: grid; grid-template-columns: auto 1fr; gap: .3rem 1rem; font-size: .92rem; margin-bottom: 1rem; }
+.details dt { color: var(--muted); font-weight: 400; }
+.details dd { margin: 0; overflow-wrap: anywhere; }
+
+/* --- Horizontal bars (probabilities, distribution) ------------------------------ */
+.prob-bars { list-style: none; padding: 0; margin: 0; max-width: 40em; }
+.prob-bar { display: grid; grid-template-columns: minmax(9rem, 12rem) 1fr 4rem; gap: .75rem; align-items: center; margin-bottom: .6rem; }
+.prob-name { font-size: .95rem; }
+.prob-track { height: .9rem; background: #e6ebe2; border-radius: var(--radius-pill); overflow: hidden; }
+.prob-fill { display: block; height: 100%; width: var(--w); min-width: 2px; background: var(--swatch); border-radius: var(--radius-pill); }
+.prob-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* --- Filters, empty states, auth ------------------------------------------------- */
+.filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.filter-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .9rem; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); text-decoration: none; font-size: .95rem; }
+.filter-pill:hover { border-color: var(--sprout); }
+.filter-pill.is-active { background: var(--paddy); border-color: var(--paddy); color: #fff; }
+.empty-state { text-align: center; padding: 3.5rem 1rem; border: 1px dashed var(--line); border-radius: var(--radius-panel); }
+.empty-inline { color: var(--muted); }
+.error-code { font-family: "IBM Plex Serif", Georgia, serif; font-size: 4rem; color: var(--sprout); line-height: 1; margin-bottom: .5rem; }
+.auth-box { max-width: 26rem; margin: 0 auto; }
+.pagination { --bs-pagination-color: var(--paddy); --bs-pagination-active-bg: var(--paddy); --bs-pagination-active-border-color: var(--paddy); }
+
+/* --- Disease profiles -------------------------------------------------------------- */
+.disease-profile { padding: 2rem 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.disease-heading { font-size: 1.9rem; font-weight: 600; display: flex; align-items: center; gap: .75rem; }
+.profile-photo { width: 100%; aspect-ratio: 3.2 / 1; object-fit: cover; border-radius: var(--radius-pill); border: 1px solid var(--line); }
+
+/* --- Dashboard -------------------------------------------------------------------- */
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-panel); overflow: hidden; margin-bottom: 1rem; }
+.figure { background: var(--surface); padding: 1rem 1.25rem; }
+.figure dt { font-weight: 400; color: var(--muted); font-size: .92rem; }
+.figure dd { margin: .2rem 0 0; font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.figure-sub { font-size: .95rem; font-weight: 400; color: var(--muted); }
+.data-table { --bs-table-bg: transparent; font-size: .92rem; max-width: 40em; font-variant-numeric: tabular-nums; }
+.columns-chart { display: grid; grid-template-columns: repeat(14, 1fr); gap: 6px; align-items: end; height: 190px; border-bottom: 1px solid var(--line); padding-top: 1.2rem; margin-bottom: 2rem; }
+.col-bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; position: relative; }
+.col-fill { width: 100%; max-width: 22px; height: var(--h); min-height: 2px; background: var(--sprout); border-radius: 6px 6px 0 0; }
+.col-value { font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.col-label { position: absolute; bottom: -1.4rem; font-size: .75rem; color: var(--muted); }
+.matrix { border-collapse: separate; border-spacing: 3px; font-variant-numeric: tabular-nums; caption-side: bottom; }
+.matrix th { font-weight: 500; font-size: .85rem; padding: .3rem .5rem; color: var(--muted); }
+.matrix thead th { text-align: center; max-width: 7rem; }
+.matrix td { text-align: center; min-width: 4.5rem; padding: .7rem .5rem; border-radius: 6px; font-weight: 500; }
+.matrix td.is-diagonal { box-shadow: inset 0 0 0 2px var(--paddy); }
+.matrix-corner { font-size: .75rem !important; }
+
+/* --- How it works ----------------------------------------------------------------- */
+.steps { padding-left: 1.25rem; max-width: 42em; }
+.steps li { margin-bottom: .6rem; }
+.summary-block { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; font-size: .8rem; overflow-x: auto; }
+
+/* --- Small screens --------------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+  .leaf-strip { aspect-ratio: auto; min-height: 170px; border-radius: 60px; padding: 1rem 1.5rem; }
+  .stretched-link-wrap { grid-template-columns: 96px 1fr; }
+  .thumb-strip { width: 96px; height: 32px; }
+  .prediction-flags { grid-column: 2; justify-content: flex-start; }
+  .prob-bar { grid-template-columns: 1fr 3.5rem; }
+  .prob-bar .prob-track { grid-column: 1 / -1; grid-row: 2; }
+  .columns-chart { gap: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

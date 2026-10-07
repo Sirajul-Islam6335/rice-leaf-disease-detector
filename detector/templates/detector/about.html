@@ -1,0 +1,52 @@
+{% extends "detector/base.html" %}
+{% load detector_extras humanize %}
+{% block title %}How it works{% endblock %}
+{% block content %}
+<h1 class="page-title">How it works</h1>
+<p class="lede">This project implements a convolutional neural network from first principles using only NumPy, writing every layer, gradient calculation and optimiser step by hand. </p>
+
+{% if not card %}
+  <div class="alert alert-warning">The model file isn't installed, so its details can't be shown. Add <code>ml_models/model.npz</code>.</div>
+{% else %}
+<div class="row g-4 g-lg-5">
+  <div class="col-lg-7">
+    <h2 class="section-title">From photo to diagnosis</h2>
+    <ol class="steps">
+      <li><strong>Resize.</strong> The photo is turned landscape if needed and resized to {{ card.image_size.0 }}×{{ card.image_size.1 }} pixels, keeping the long, thin shape of a leaf.</li>
+      <li><strong>Standardise.</strong> Each colour channel is shifted and scaled with the mean and spread of the training photos.</li>
+      <li><strong>Detect patterns.</strong> Four blocks of 3×3 convolution, batch normalisation, ReLU and 2×2 max pooling learn lesion features, from edges and colour patches up to whole spots and streaks.</li>
+      <li><strong>Pool.</strong> Global average pooling measures how strongly each of 128 features appears anywhere on the leaf.</li>
+      <li><strong>Classify.</strong> A dense layer and softmax turn those 128 numbers into one probability per disease.{% if card.tta %} The photo is also scored flipped horizontally and vertically, and the three results are averaged.{% endif %}</li>
+      <li><strong>Flag.</strong> If the top probability is below {{ card.threshold|pct }}, the result is marked low confidence.</li>
+    </ol>
+
+    <h2 class="section-title">Architecture</h2>
+    <pre class="summary-block">{{ card.summary }}</pre>
+    <p class="small text-muted-2">{{ card.num_params|intcomma }} trainable parameters. Trained with AdamW, a warm-up and cosine learning-rate schedule,
+      label smoothing and data augmentation; the best epoch ({{ card.best_epoch }}) was chosen on a separate validation set.</p>
+  </div>
+
+  <div class="col-lg-5">
+    <h2 class="section-title">Measured accuracy</h2>
+    <p>On {{ card.test.n_samples }} test photos never used in training: <strong>{{ card.test.accuracy|pct:1 }}</strong> accuracy,
+      macro-F1 {{ card.test.macro_f1|floatformat:2 }}.</p>
+    {% if card.cv %}
+      <p>Across {{ card.cv.k }}-fold cross-validation on all {{ card.cv.pooled.n_samples }} photos:
+        <strong>{{ card.cv.accuracy_mean|pct:1 }}</strong> ± {{ card.cv.accuracy_std|pct:1 }} accuracy.
+        Cross-validation is the more reliable figure, because an {{ card.test.n_samples }}-photo test set moves 5.6 points per photo.</p>
+      {% include "detector/_matrix.html" with names=card.class_names rows=card.cv.matrix caption="Cross-validation, all photos. Rows: actual disease. Columns: prediction." %}
+    {% else %}
+      {% include "detector/_matrix.html" with names=card.class_names rows=card.test_matrix caption="Test set. Rows: actual disease. Columns: prediction." %}
+    {% endif %}
+
+    <h2 class="section-title">Limits</h2>
+    <ul class="tight-list">
+      <li>Trained on only 120 photos of single leaves on a plain background. Field photos with clutter are harder.</li>
+      <li>It knows three diseases. A healthy leaf or another disease is still assigned to one of them.</li>
+      <li>Brown spot and leaf smut are its most common confusion: both show small dark spots.</li>
+      <li>Every bacterial-leaf-blight training photo has the same resolution, which may give the model a shortcut on that class.</li>
+    </ul>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

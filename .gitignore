@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+media/
+staticfiles/
+runs/
+.DS_Store
+.venv/
+venv/
+.ipynb_checkpoints/
+# Training images (UCI Rice Leaf Diseases dataset) - download separately to retrain
+mydata/

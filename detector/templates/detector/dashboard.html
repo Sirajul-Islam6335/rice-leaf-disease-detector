@@ -1,0 +1,74 @@
+{% extends "detector/base.html" %}
+{% load detector_extras %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+<p class="lede">How the tool is being used across all accounts, and how often users agree with it.
+  Every figure is computed by SQL queries over the prediction table.</p>
+
+<dl class="figures">
+  <div class="figure"><dt>Diagnoses</dt><dd>{{ overview.total }}</dd></div>
+  <div class="figure"><dt>Average confidence</dt><dd>{% if overview.total %}{{ overview.avg_confidence|pct:1 }}{% else %}None yet{% endif %}</dd></div>
+  <div class="figure"><dt>Flagged as low confidence</dt><dd>{{ overview.uncertain }}<span class="figure-sub">{% if overview.total %} ({{ overview.uncertain_share|pct }}){% endif %}</span></dd></div>
+  <div class="figure"><dt>Confirmed by users</dt><dd>{% if overview.field_accuracy is not None %}{{ overview.field_accuracy|pct }}<span class="figure-sub"> of {{ overview.reviewed }}</span>{% else %}No feedback yet{% endif %}</dd></div>
+</dl>
+
+<div class="row g-4 g-lg-5">
+  <section class="col-lg-6" aria-labelledby="dist-title">
+    <h2 id="dist-title" class="section-title">Diagnoses by disease</h2>
+    <ul class="prob-bars">
+      {% for r in by_disease %}
+        <li class="prob-bar">
+          <span class="prob-name">{{ r.name }}</span>
+          <span class="prob-track" role="img" aria-label="{{ r.predictions }} diagnoses">
+            <span class="prob-fill" style="--w: {% widthratio r.share 1 100 %}%; --swatch: {{ r.color }}"></span>
+          </span>
+          <span class="prob-value">{{ r.predictions }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <table class="table table-sm data-table mt-3">
+      <thead><tr><th scope="col">Disease</th><th scope="col" class="text-end">Diagnoses</th><th scope="col" class="text-end">Avg. confidence</th><th scope="col" class="text-end">Flagged</th></tr></thead>
+      <tbody>
+      {% for r in by_disease %}
+        <tr><td><a href="{% url 'detector:diseases' %}#{{ r.slug }}">{{ r.name }}</a></td><td class="text-end">{{ r.predictions }}</td>
+          <td class="text-end">{% if r.avg_confidence is not None %}{{ r.avg_confidence|pct:1 }}{% else %}-{% endif %}</td><td class="text-end">{{ r.uncertain }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="daily-title">
+    <h2 id="daily-title" class="section-title">Last 14 days</h2>
+    <div class="columns-chart" role="img" aria-label="Diagnoses per day over the last 14 days">
+      {% for d in daily %}
+        <div class="col-bar" title="{{ d.day|date:'j M' }}: {{ d.n }}">
+          <span class="col-value">{% if d.n %}{{ d.n }}{% endif %}</span>
+          <span class="col-fill" style="--h: {% widthratio d.height 1 100 %}%"></span>
+          <span class="col-label">{{ d.day|date:"j" }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <p class="small text-muted-2 mt-2">Days in UTC, {{ daily.0.day|date:"j M" }} to {{ daily|last|get_item:"day"|date:"j M" }}.</p>
+  </section>
+</div>
+
+<div class="row g-4 g-lg-5 mt-1">
+  <section class="col-lg-7" aria-labelledby="fb-title">
+    <h2 id="fb-title" class="section-title">Model vs. user feedback</h2>
+    {% if feedback.total %}
+      {% include "detector/_matrix.html" with names=feedback.names rows=feedback.rows caption="Rows: the disease users confirmed. Columns: what the model predicted." %}
+    {% else %}
+      <p class="empty-inline">No feedback yet. When users answer "Was this right?" on a diagnosis, their answers appear here as a confusion matrix.</p>
+    {% endif %}
+  </section>
+  <section class="col-lg-5" aria-labelledby="queue-title">
+    <h2 id="queue-title" class="section-title">Waiting for review</h2>
+    {% if review_queue %}
+      <ul class="prediction-list compact">{% for p in review_queue %}{% include "detector/_prediction_row.html" %}{% endfor %}</ul>
+    {% else %}
+      <p class="empty-inline">Nothing you can see is waiting. Low-confidence diagnoses without feedback appear here.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

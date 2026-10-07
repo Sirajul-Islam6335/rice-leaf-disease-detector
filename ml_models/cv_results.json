@@ -1,0 +1,91 @@
+{
+  "k": 5,
+  "folds": [
+    {
+      "fold": 1,
+      "best_epoch": 27,
+      "accuracy": 0.9166666666666666,
+      "macro_f1": 0.9131652661064426,
+      "log_loss": 0.24458752118681948
+    },
+    {
+      "fold": 2,
+      "best_epoch": 40,
+      "accuracy": 0.9166666666666666,
+      "macro_f1": 0.9153439153439153,
+      "log_loss": 0.29501857143316307
+    },
+    {
+      "fold": 3,
+      "best_epoch": 60,
+      "accuracy": 0.8333333333333334,
+      "macro_f1": 0.8341880341880342,
+      "log_loss": 0.6373731508346296
+    },
+    {
+      "fold": 4,
+      "best_epoch": 59,
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "log_loss": 0.21496000239197355
+    },
+    {
+      "fold": 5,
+      "best_epoch": 38,
+      "accuracy": 0.625,
+      "macro_f1": 0.5140350877192983,
+      "log_loss": 0.6541122440955445
+    }
+  ],
+  "accuracy_mean": 0.8583333333333332,
+  "macro_f1_mean": 0.8353464606715381,
+  "log_loss_mean": 0.40921029798842606,
+  "accuracy_std": 0.14312970031098055,
+  "macro_f1_std": 0.1889500513278145,
+  "log_loss_std": 0.21789265534938584,
+  "pooled_out_of_fold": {
+    "accuracy": 0.8583333333333333,
+    "macro_precision": 0.8578811369509044,
+    "macro_recall": 0.8583333333333333,
+    "macro_f1": 0.8546750603195562,
+    "log_loss": 0.40921029798842606,
+    "n_samples": 120,
+    "confusion_matrix": [
+      [
+        39,
+        1,
+        0
+      ],
+      [
+        4,
+        28,
+        8
+      ],
+      [
+        0,
+        4,
+        36
+      ]
+    ],
+    "per_class": {
+      "Bacterial leaf blight": {
+        "precision": 0.9069767441860465,
+        "recall": 0.975,
+        "f1": 0.9397590361445783,
+        "support": 40
+      },
+      "Brown spot": {
+        "precision": 0.8484848484848485,
+        "recall": 0.7,
+        "f1": 0.7671232876712328,
+        "support": 40
+      },
+      "Leaf smut": {
+        "precision": 0.8181818181818182,
+        "recall": 0.9,
+        "f1": 0.8571428571428572,
+        "support": 40
+      }
+    }
+  }
+}

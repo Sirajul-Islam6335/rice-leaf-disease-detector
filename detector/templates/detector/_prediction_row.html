@@ -1,0 +1,20 @@
+{% load detector_extras humanize %}
+<li class="prediction-row">
+  <a class="stretched-link-wrap" href="{{ p.get_absolute_url }}">
+    <img class="thumb-strip" src="{{ p.image.url }}" alt="" loading="lazy">
+    <span class="prediction-main">
+      <span class="prediction-label">
+        <span class="swatch" style="--swatch: {{ p.predicted_disease.color }}" aria-hidden="true"></span>
+        {{ p.predicted_disease.name }}
+      </span>
+      <span class="prediction-sub">{{ p.confidence|pct }} sure, {{ p.created_at|naturaltime }}</span>
+    </span>
+    <span class="prediction-flags">
+      {% if p.uncertain and not p.true_disease_id %}<span class="badge badge-review"><i class="bi bi-flag" aria-hidden="true"></i> Needs review</span>{% endif %}
+      {% if p.true_disease_id %}
+        {% if p.is_correct %}<span class="badge badge-ok"><i class="bi bi-check2" aria-hidden="true"></i> Confirmed</span>
+        {% else %}<span class="badge badge-wrong"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Corrected to {{ p.true_disease.name }}</span>{% endif %}
+      {% endif %}
+    </span>
+  </a>
+</li>

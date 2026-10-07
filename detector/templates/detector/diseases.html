@@ -1,0 +1,33 @@
+{% extends "detector/base.html" %}
+{% load static %}
+{% block title %}Diseases{% endblock %}
+{% block content %}
+<h1 class="page-title">The three diseases</h1>
+<p class="lede">What each disease looks like on the leaf, what encourages it, and how growers usually manage it.
+  Local extension services can recommend varieties and products registered where you farm.</p>
+
+<nav class="filter-row" aria-label="Jump to a disease">
+  {% for d in diseases %}<a class="filter-pill" href="#{{ d.slug }}"><span class="swatch" style="--swatch: {{ d.color }}" aria-hidden="true"></span>{{ d.name }}</a>{% endfor %}
+</nav>
+
+{% for d in diseases %}
+<article class="disease-profile" id="{{ d.slug }}">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      {% if d.sample_image %}<img class="profile-photo" src="{% static d.sample_image %}" alt="Rice leaf with {{ d.name|lower }}" loading="lazy">{% endif %}
+    </div>
+    <div class="col-lg-7">
+      <h2 class="disease-heading"><span class="swatch swatch-lg" style="--swatch: {{ d.color }}" aria-hidden="true"></span>{{ d.name }}</h2>
+      <p class="pathogen">{{ d.get_kind_display }} disease caused by <em>{{ d.pathogen }}</em></p>
+      <p>{{ d.summary }}</p>
+    </div>
+  </div>
+  <div class="row g-4 mt-1">
+    <div class="col-md-4"><h3 class="sub-title">Symptoms</h3><ul class="tight-list">{% for s in d.symptom_list %}<li>{{ s }}</li>{% endfor %}</ul></div>
+    <div class="col-md-4"><h3 class="sub-title">Favoured by</h3><ul class="tight-list">{% for s in d.favoured_by_list %}<li>{{ s }}</li>{% endfor %}</ul></div>
+    <div class="col-md-4"><h3 class="sub-title">Management</h3><ul class="tight-list">{% for s in d.management_list %}<li>{{ s }}</li>{% endfor %}</ul></div>
+  </div>
+  {% if d.looks_like %}<p class="note mt-2"><i class="bi bi-info-circle" aria-hidden="true"></i> {{ d.looks_like }}</p>{% endif %}
+</article>
+{% endfor %}
+{% endblock %}

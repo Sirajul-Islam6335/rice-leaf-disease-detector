@@ -1,0 +1,105 @@
+{% extends "detector/base.html" %}
+{% load detector_extras humanize %}
+{% block title %}{{ disease.name }}, {{ p.confidence|pct }}{% endblock %}
+{% block content %}
+<p class="mb-3"><a href="{% url 'detector:home' %}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Diagnose another leaf</a></p>
+
+<div class="row g-4 g-lg-5">
+  <div class="col-lg-8">
+    <figure class="result-photo">
+      <img src="{{ p.image.url }}" alt="Uploaded rice leaf photo{% if p.original_filename %} ({{ p.original_filename }}){% endif %}">
+    </figure>
+
+    <h1 class="diagnosis-title">
+      <span class="swatch swatch-lg" style="--swatch: {{ disease.color }}" aria-hidden="true"></span>
+      {{ disease.name }}
+    </h1>
+    <p class="diagnosis-line">
+      The model is <strong>{{ p.confidence|pct:1 }}</strong> sure.
+      {% with runner=bars.1 %}{% if runner %}Next most likely: {{ runner.name|lower }}, {{ runner.probability|pct:1 }}.{% endif %}{% endwith %}
+    </p>
+
+    {% if p.uncertain %}
+      <div class="alert alert-warning d-flex gap-2" role="status">
+        <i class="bi bi-flag-fill" aria-hidden="true"></i>
+        <div><strong>Low confidence.</strong> The top result is under {{ threshold|pct }}, so treat it as a guess.
+          The leaf may be healthy, have a different disease, or the photo may be unclear. Have an expert look at it, or
+          try a sharper photo of one leaf against a plain background.</div>
+      </div>
+    {% endif %}
+
+    <h2 class="section-title">Probability for each disease</h2>
+    {% include "detector/_bars.html" with bars=bars %}
+
+    <h2 class="section-title">About {{ disease.name|lower }}</h2>
+    <p>{{ disease.summary }}</p>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h3 class="sub-title">Symptoms to check on the leaf</h3>
+        <ul class="tight-list">{% for s in disease.symptom_list %}<li>{{ s }}</li>{% endfor %}</ul>
+      </div>
+      <div class="col-md-6">
+        <h3 class="sub-title">What to do</h3>
+        <ul class="tight-list">{% for s in disease.management_list %}<li>{{ s }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+    {% if disease.looks_like %}<p class="note"><i class="bi bi-info-circle" aria-hidden="true"></i> {{ disease.looks_like }}</p>{% endif %}
+    <p><a href="{{ disease.get_absolute_url }}">Full disease profile</a></p>
+  </div>
+
+  <aside class="col-lg-4">
+    <section class="panel" aria-labelledby="feedback-title">
+      <h2 id="feedback-title" class="panel-title">Was this right?</h2>
+      {% if p.has_feedback %}
+        <p class="mb-2">
+          {% if p.is_correct %}<span class="badge badge-ok"><i class="bi bi-check2" aria-hidden="true"></i> Confirmed</span>
+          {% else %}<span class="badge badge-wrong">Corrected to {{ p.true_disease.name }}</span>{% endif %}
+          <span class="small text-muted-2">{{ p.feedback_at|naturaltime }}</span>
+        </p>
+      {% else %}
+        <p class="small text-muted-2">Your answer is stored with this diagnosis and feeds the accuracy figures on the dashboard.</p>
+      {% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <fieldset>
+          <legend class="form-label small">{{ form.true_disease.label }}</legend>
+          {% for radio in form.true_disease %}
+            <div class="form-check">
+              {{ radio.tag }}
+              <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+            </div>
+          {% endfor %}
+          {% for e in form.true_disease.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+        </fieldset>
+        <label class="form-label small mt-2" for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+        {{ form.note }}
+        <button class="btn btn-primary w-100 mt-3" type="submit">{% if p.has_feedback %}Update feedback{% else %}Save feedback{% endif %}</button>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="details-title">
+      <h2 id="details-title" class="panel-title">Details</h2>
+      <dl class="details">
+        <dt>Photo</dt><dd>{{ p.original_filename|default:"Uploaded image" }}</dd>
+        <dt>Diagnosed</dt><dd>{{ p.created_at|date:"j M Y, H:i" }}</dd>
+        <dt>Source</dt><dd>{{ p.get_source_display }}</dd>
+        <dt>Model</dt><dd>{{ p.model_version }}</dd>
+        <dt>Inference time</dt><dd>{{ p.inference_ms|floatformat:0 }} ms</dd>
+        {% if p.feedback_note %}<dt>Your note</dt><dd>{{ p.feedback_note }}</dd>{% endif %}
+      </dl>
+      <form method="post" action="{% url 'detector:prediction_delete' p.pk %}"
+            onsubmit="return confirm('Delete this diagnosis and its photo? This cannot be undone.');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger btn-sm" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> Delete diagnosis</button>
+      </form>
+    </section>
+
+    {% if not user.is_authenticated %}
+      <section class="panel panel-quiet">
+        <p class="mb-2">This diagnosis is kept for this browser session only.</p>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'detector:signup' %}">Create an account to keep it</a>
+      </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

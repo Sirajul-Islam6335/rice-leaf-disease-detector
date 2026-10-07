@@ -1,0 +1,20 @@
+{% load detector_extras %}
+<div class="table-responsive">
+<table class="matrix">
+  <caption class="small text-muted-2">{{ caption }}</caption>
+  <thead>
+    <tr><th scope="col" class="matrix-corner">Actual \ Predicted</th>
+      {% for n in names %}<th scope="col">{{ n }}</th>{% endfor %}</tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <th scope="row">{{ row.name }}</th>
+        {% for c in row.cells %}
+          <td style="background: {{ c.share|shade }}; color: {{ c.share|ink_on }}" class="{% if c.diagonal %}is-diagonal{% endif %}">{{ c.count }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

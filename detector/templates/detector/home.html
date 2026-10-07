@@ -1,0 +1,78 @@
+{% extends "detector/base.html" %}
+{% load static detector_extras humanize %}
+{% block title %}Check a rice leaf{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1 class="page-title">Check a rice leaf for disease</h1>
+  <p class="lede">Photograph a single leaf lying flat, then upload it. The model names the most likely of three
+    diseases and tells you how sure it is.</p>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="upload-form" novalidate data-upload-form>
+  {% csrf_token %}
+  <div class="dropzone {% if form.image.errors %}has-error{% endif %}" data-dropzone>
+    {{ form.image }}
+    <label for="{{ form.image.id_for_label }}" class="leaf-strip">
+      <img class="leaf-strip-preview" alt="Preview of the selected photo" hidden data-preview>
+      <span class="leaf-strip-prompt" data-prompt>
+        <span class="prompt-main"><i class="bi bi-image" aria-hidden="true"></i> Drop a leaf photo here, or <span class="prompt-link">choose a file</span></span>
+        <span class="prompt-hint">Lay the leaf across the frame, like this strip. JPG, PNG, WebP or BMP, up to {{ max_mb }} MB.</span>
+      </span>
+    </label>
+  </div>
+  {% for error in form.image.errors %}<p class="field-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> {{ error }}</p>{% endfor %}
+  <div class="upload-actions">
+    <button class="btn btn-primary btn-lg" type="submit" data-submit>
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true" hidden></span>
+      <span data-label>Diagnose leaf</span>
+    </button>
+    <span class="text-muted-2 small" data-filename>No photo chosen</span>
+  </div>
+</form>
+
+<section class="samples" aria-labelledby="samples-title">
+  <h2 id="samples-title" class="section-title">No photo to hand? Try a sample</h2>
+  <div class="sample-row">
+    {% for d in diseases %}{% if d.sample_image %}
+      <form method="post" action="{% url 'detector:predict_sample' d.slug %}" data-upload-form>
+        {% csrf_token %}
+        <button type="submit" class="sample-button" data-submit>
+          <img src="{% static d.sample_image %}" alt="" loading="lazy">
+          <span data-label>Sample leaf with {{ d.name|lower }}</span>
+        </button>
+      </form>
+    {% endif %}{% endfor %}
+  </div>
+  <p class="small text-muted-2 mt-2">Samples come from the held-out test images, which the model never trained on.</p>
+</section>
+
+<section class="recognises" aria-labelledby="recognises-title">
+  <h2 id="recognises-title" class="section-title">What it can recognise</h2>
+  <ul class="disease-rows">
+    {% for d in diseases %}
+      <li class="disease-row">
+        <span class="swatch swatch-lg" style="--swatch: {{ d.color }}" aria-hidden="true"></span>
+        <div>
+          <h3 class="disease-name"><a href="{{ d.get_absolute_url }}">{{ d.name }}</a></h3>
+          <p class="pathogen">{{ d.get_kind_display }} disease caused by <em>{{ d.pathogen }}</em></p>
+          <p class="mb-0">{{ d.symptom_list.0 }}.</p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <p class="small text-muted-2">Healthy leaves and other diseases are not in its training data. Such photos are still
+    assigned to one of these three, usually with low confidence, so treat flagged results with care.</p>
+</section>
+
+{% if recent %}
+<section aria-labelledby="recent-title">
+  <div class="d-flex align-items-baseline justify-content-between">
+    <h2 id="recent-title" class="section-title">Your recent diagnoses</h2>
+    <a href="{% url 'detector:history' %}">See all</a>
+  </div>
+  <ul class="prediction-list">
+    {% for p in recent %}{% include "detector/_prediction_row.html" %}{% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "detector/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="empty-state">
+  <p class="error-code">{{ code }}</p>
+  <h1 class="page-title">{{ title }}</h1>
+  <p class="lede mx-auto">{{ message }}</p>
+  <a class="btn btn-primary" href="{% url 'detector:home' %}">Diagnose a leaf</a>
+</div>
+{% endblock %}
